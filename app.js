@@ -6,6 +6,8 @@ const hbs = require('hbs');
 const SpotifyWebApi = require('spotify-web-api-node');
 
 const app = express();
+app.use(express.json()); // need for acces body
+app.use(express.urlencoded()); // need for access body from forms
 
 app.set('view engine', 'hbs');
 app.set('views', __dirname + '/views');
@@ -27,6 +29,19 @@ spotifyApi
 
 // Our routes go here:
 
+app.get("/", (req, res)=>{
+    res.render("home");
+});
 
+app.get("/artist-search", (req, res)=>{
+    const searchArtist = req.query.searchArtist;
+
+    spotifyApi.searchArtists(searchArtist)
+    .then(data => {
+        console.log('The received data from the API: ', data.body.artists.items[0]);
+        res.render("artist-search-results", data.body);
+    })
+    .catch(err => console.log('The error while searching artists occurred: ', err));
+});
 
 app.listen(process.env.PORT, () => console.log('My Spotify project running on port 3000 🎧 🥁 🎸 🔊'));
